@@ -1,0 +1,4 @@
+This packages are not avaible on the repositories of the package installer
+
+ -> Awesome Tabs
+https://github.com/manateelazycat/awesome-tab
