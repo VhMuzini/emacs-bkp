@@ -11,7 +11,7 @@
  ;; If there is more than one, they won't work right.
  '(inhibit-startup-screen t)
  '(package-selected-packages
-   '(doom-themes omnisharp beacon dashboard async mark-multiple duplicate-thing yasnippet-snippets diminish auto-package-update projectile undo-tree company-irony company-c-headers meghanada yasnippet magit which-key treemacs-icons-dired treemacs swiper htmlize all-the-icons highlight-symbol multiple-cursors scss-mode use-package csharp-mode company-tabnine lsp-ui lsp-mode dumb-jump git-modes ng2-mode company-web emmet-mode web-mode-edit-element json-mode dotenv-mode typescript-mode company web-mode js2-mode ivy atom-one-dark-theme))
+   '(company-prescient doom-themes omnisharp beacon dashboard async mark-multiple duplicate-thing yasnippet-snippets diminish projectile undo-tree company-irony company-c-headers meghanada yasnippet magit which-key treemacs-icons-dired treemacs swiper htmlize all-the-icons highlight-symbol multiple-cursors scss-mode use-package csharp-mode lsp-ui lsp-mode dumb-jump git-modes ng2-mode company-web emmet-mode web-mode-edit-element json-mode dotenv-mode typescript-mode company web-mode js2-mode ivy atom-one-dark-theme))
  '(warning-suppress-types '((lsp-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -22,16 +22,15 @@
 
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-(package-initialize)
+;;(package-initialize)
 
 ;; ---------------------- Editor Settings ------------------
 
 ;; Start maximized
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
-;; Display line numbers
-(add-hook 'prog-mode-hook 'display-line-numbers-mode)
-(add-hook 'text-mode-hook 'display-line-numbers-mode)
+;; Enable Line Numbers globally
+(global-display-line-numbers-mode 1)
 
 ;; I think it's really good
 (load-theme 'doom-moonlight t)
@@ -64,10 +63,7 @@
 (setq gc-cons-threshold 100000000)
 (setq read-process-output-max (* 1024 1024)) ;; 1mb
 
-;; Enable Line Numbers globaly
-(global-display-line-numbers-mode 1)
-
-;; Allow Copypaster outside emacs
+;; Allow Copy/paster outside emacs
 (setq x-select-enable-clipboard t)
 
 ;; Scroll with ctrl + arrow
@@ -95,18 +91,11 @@
 ;;‘y’ or ‘n’ instead of ‘yes’ or ‘no’ when confirming
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-;;Show parent parentheses
+;;Show parent parenthese
 (show-paren-mode 1)
 
 ;;New lines at the end of the file
 (setq next-line-add-newlines t)
-
-;; Useful Function
-(defun close-all-buffers ()
-  "Kill all buffers without regard for their origin."
-  (interactive)
-  (mapc 'kill-buffer (buffer-list)))
-(global-set-key (kbd "C-M-s-k") 'close-all-buffers)
 
 ;; Set utf-8 as default enconding
 (setq locale-coding-system 'utf-8)
@@ -127,8 +116,11 @@
 ;; Emacs Treats Camel Case Correctly now
 (global-subword-mode 1)
 
+;; Highlight current Line
+;;(global-hl-line-mode t)
+
 ;; ----------------------------------------------------------------------------------------------
-;; ----------------------------- Packages Area --------------------------------------------------
+;; ------------------------------------ Packages Area -------------------------------------------
 ;; ----------------------------------------------------------------------------------------------
 
 ;; Defer all packages for quickly startup
@@ -161,7 +153,6 @@
 ;; Useful frontend completion and functions
 (use-package ivy
 :ensure t
-:defer nil
 :config
 (global-set-key (kbd "C-x b") #'ivy-switch-buffer))
 
@@ -175,37 +166,43 @@
 (use-package company
   :ensure t
   :config
-  (setq company-idle-delay 0)
+  (setq company-idle-delay 0.01)
   (setq company-tooltip-idle-delay 0)
   (setq company-minimum-prefix-length 1)
   (setq company-tooltip-align-annotations t)
   (setq company-show-numbers t)
-  (setq company-dabbrev-downcase 0)
-  (setq company-dabbrev-minimum-length 2)
-  (setq company-dabbrev-other-buffers t)
+  ;;(setq company-tooltip-limit 20)
+  ;;(setq company-dabbrev-downcase 0)
+  ;;(setq company-dabbrev-minimum-length 2)
+  ;;(setq company-dabbrev-other-buffers t)
   (setq company-dabbrev-code-other-buffers t)
-  (setq completion-ignore-case t)
   (setq company-dabbrev-ignore-case 'keep-prefix)
+  (setq completion-ignore-case t)
   (setq company-transformers '(company-sort-by-occurrence))
   (define-key company-active-map (kbd "M-n") nil)
   (define-key company-active-map (kbd "M-p") nil)
   (define-key company-active-map (kbd "C-n") #'company-select-next)
   (define-key company-active-map (kbd "C-p") #'company-select-previous)
-  ;;(define-key company-active-map (kbd "SPC") #'company-abort)
+  (define-key company-active-map (kbd "ESC") #'company-abort)
   (define-key company-active-map (kbd "<tab>") #'company-complete-selection)
-  ;;(setq company-backends
-  ;;'((company-capf company-keywords company-files company-dabbrev-code company-abbrev :with company-yasnippet company-dabbrev)))
-  (setq company-backends
-  '((company-capf company-keywords :with company-yasnippet company-dabbrev-code company-dabbrev)))
+  (setq company-backends '((company-capf :with company-yasnippet :separate 
+							company-keywords company-files company-dabbrev-code)))
   :hook
   ((prog-mode markdown-mode) . company-mode))
+  
+;; Better sort of the suggestions
+ (use-package company-prescient
+   :ensure t
+   :defer nil
+   :after (company)
+   :config
+   (company-prescient-mode 1)
+   (prescient-persist-mode))
 
 ;; -------------- Yasnippet
 (use-package yasnippet
   :ensure t
   :diminish yas-minor-mode
-  :hook
-  ((prog-mode) . yas-minor-mode)
   :config
    (use-package yasnippet-snippets
       :ensure t)
@@ -213,7 +210,8 @@
   :hook ((typescript-mode-hook . (lambda ()
                                     (yas-activate-extra-mode 'js2-mode)))
          (web-mode-hook . (lambda ()
-                             (yas-activate-extra-mode 'html-mode)))))							
+                             (yas-activate-extra-mode 'html-mode))))
+((prog-mode) . yas-minor-mode))
 
 ;; -------------- LSP Configs
 (use-package lsp-mode
@@ -334,9 +332,10 @@
 (use-package undo-tree
   :ensure t
   :defer nil
+  :diminish undo-tree-mode
   :config
   (global-undo-tree-mode))
-  
+
 (use-package projectile
   :ensure t
   :defer nil
@@ -346,7 +345,7 @@
   (setq projectile-enable-caching t)
   (setq projectile-require-project-root t)
   ;;(setq projectile-ensure-project nil)
-  (setq projectile-globally-ignored-directories '("node_modules")) 
+  (setq projectile-globally-ignored-directories '("*node_modules")) 
   (setq projectile-completion-system 'ivy)
   (setq projectile-dynamic-mode-line nil))
 
@@ -363,15 +362,16 @@
   :defer nil
   :config
     (dashboard-setup-startup-hook)
+	(setq dashboard-set-init-info t)
     (setq dashboard-startup-banner "~/.emacs.d/img/Haruhi_Suzumiya4.png")
 	(setq dashboard-banner-logo-title "Property of Suzumiya Haruhi")
 	(setq dashboard-set-file-icons t)
 	(setq dashboard-set-init-info t)
 	(setq dashboard-path-max-length 60)
-	(setq dashboard-set-init-info t)
 	(setq dashboard-center-content t)
+	(setq dashboard-footer-messages '("Hail Lain!"))
 	;;(setq initial-buffer-choice (lambda () (dashboard-refresh-buffer)(get-buffer "*dashboard*")))
-    (setq dashboard-items '((recents  . 2)
+    (setq dashboard-items '((recents  . 5)
                             (projects . 5))))
   
   ;; Diminish packages
@@ -380,11 +380,11 @@
   :defer nil
   :init
   (diminish 'which-key-mode)
-  (diminish 'undo-tree-mode)
   (diminish 'abbrev-mode)
   (diminish 'flycheck-mode)
   (diminish 'beacon-mode)
   (diminish 'subword-mode)
+  (diminish 'company-mode)
   (diminish 'eldoc-mode))
 
 ;; -----------------------------  
@@ -417,7 +417,7 @@
   ('irony-mode-hook) . 'irony-cdb-autosetup-compile-options)
   
 ;; Web development Area
-  (use-package js2-mode
+(use-package js2-mode
   :defer nil
   :commands (js2-mode)
   :mode ("\\.js?\\'" . js2-mode))
@@ -442,8 +442,8 @@
   (setq web-mode-enable-current-column-highlight t)
   :commands (web-mode)
   :mode (("\\.html?\\'" . web-mode)
-		 ("\\.tsx\\'" . web-mode)))
-		 
+		 ("\\.tsx\\'" . web-mode)
+		 ("\\.jsx\\'" . web-mode)))
 
 (use-package emmet-mode
 :ensure t
@@ -452,15 +452,22 @@
 :hook
 ((web-mode) . emmet-mode))
 
-(require 'company-web-html)
-(add-hook 'web-mode-hook
-          (lambda ()
-            (setq-local company-backends
-                        '((company-web-html :separate
-							company-yasnippet
-                           company-dabbrev-code
-                           company-keywords)
-                          company-capf))))
+(use-package company-web-html
+  :config
+  (add-hook 'web-mode-hook
+            (lambda ()
+              (setq-local company-backends
+                          '((company-capf :with company-web-html
+                                               company-yasnippet
+                                               company-dabbrev-code
+                                               company-keywords))))))
+
+;; Css
+(use-package scss-mode
+  :defer nil
+  :commands (scss-mode)
+  :mode ((("\\.css\\'" . scss-mode))
+		  ("\\.scss\\'" . scss-mode)))
 
 ;; Json-mode
 (use-package json-mode
@@ -474,14 +481,7 @@
 :commands (csharp-mode)
 :mode ("\\.cs\\'" . csharp-mode))
 
-;; Css
-(use-package css-mode
-  :defer nil
-  :commands (css-mode)
-  :mode ("\\.css\\'" . css-mode))
-
-;; Scss
-(use-package scss-mode
-  :defer nil
-  :commands (scss-mode)
-  :mode ("\\.scss\\'" . scss-mode))
+(use-package omnisharp
+:defer t
+:hook
+((csharp-mode) . omnisharp-mode))
