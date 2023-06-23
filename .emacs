@@ -1,4 +1,4 @@
-;; Install globaly with npm: 
+;; Install globaly with npm:
 ;; typescript
 ;; typescript-language-server
 ;; eslint
@@ -11,7 +11,7 @@
  ;; If there is more than one, they won't work right.
  '(inhibit-startup-screen t)
  '(package-selected-packages
-   '(company-prescient doom-themes omnisharp beacon dashboard async mark-multiple duplicate-thing yasnippet-snippets diminish projectile undo-tree company-irony company-c-headers meghanada yasnippet magit which-key treemacs-icons-dired treemacs swiper htmlize all-the-icons highlight-symbol multiple-cursors scss-mode use-package csharp-mode lsp-ui lsp-mode dumb-jump git-modes ng2-mode company-web emmet-mode web-mode-edit-element json-mode dotenv-mode typescript-mode company web-mode js2-mode ivy atom-one-dark-theme))
+   '(exec-path-from-shell company-prescient doom-themes omnisharp beacon dashboard async mark-multiple duplicate-thing yasnippet-snippets diminish projectile undo-tree company-irony company-c-headers meghanada yasnippet magit which-key treemacs-icons-dired treemacs swiper htmlize all-the-icons highlight-symbol multiple-cursors scss-mode use-package csharp-mode lsp-ui lsp-mode dumb-jump git-modes ng2-mode company-web emmet-mode web-mode-edit-element json-mode dotenv-mode typescript-mode company web-mode js2-mode ivy))
  '(warning-suppress-types '((lsp-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -22,7 +22,11 @@
 
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-;;(package-initialize)
+(package-initialize)
+
+;; To make the nvm version work. (I hate node management)
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize))
 
 ;; ---------------------- Editor Settings ------------------
 
@@ -153,6 +157,7 @@
 ;; Useful frontend completion and functions
 (use-package ivy
 :ensure t
+:defer nil
 :config
 (global-set-key (kbd "C-x b") #'ivy-switch-buffer))
 
@@ -185,11 +190,11 @@
   (define-key company-active-map (kbd "C-p") #'company-select-previous)
   (define-key company-active-map (kbd "ESC") #'company-abort)
   (define-key company-active-map (kbd "<tab>") #'company-complete-selection)
-  (setq company-backends '((company-capf :with company-yasnippet :separate 
+  (setq company-backends '((company-capf :with company-yasnippet :separate
 							company-keywords company-files company-dabbrev-code)))
   :hook
   ((prog-mode markdown-mode) . company-mode))
-  
+
 ;; Better sort of the suggestions
  (use-package company-prescient
    :ensure t
@@ -251,7 +256,7 @@
 
 (use-package htmlize
   :ensure t)
-	
+
 ;; Tree view
 (use-package treemacs
   :ensure t
@@ -295,7 +300,7 @@
           treemacs-tag-follow-delay              1.5
           treemacs-width                         30)
     (treemacs-resize-icons 11)
-	
+
     (treemacs-follow-mode t)
     (treemacs-filewatch-mode t)
     (treemacs-fringe-indicator-mode t)
@@ -313,7 +318,7 @@
         ("C-x t B"   . treemacs-bookmark)
         ("C-x t C-t" . treemacs-find-file)
         ("C-x t M-t" . treemacs-find-tag)))
-	
+
 (use-package treemacs-icons-dired
 	:after treemacs dired
 	:ensure t
@@ -324,11 +329,11 @@
   :ensure t
   :init
   (which-key-mode))
-  
+
 ;; Like magic but with a t
 (use-package magit
   :ensure t)
-  
+
 (use-package undo-tree
   :ensure t
   :defer nil
@@ -345,7 +350,7 @@
   (setq projectile-enable-caching t)
   (setq projectile-require-project-root t)
   ;;(setq projectile-ensure-project nil)
-  (setq projectile-globally-ignored-directories '("*node_modules")) 
+  (setq projectile-globally-ignored-directories '("*node_modules"))
   (setq projectile-completion-system 'ivy)
   (setq projectile-dynamic-mode-line nil))
 
@@ -373,7 +378,7 @@
 	;;(setq initial-buffer-choice (lambda () (dashboard-refresh-buffer)(get-buffer "*dashboard*")))
     (setq dashboard-items '((recents  . 5)
                             (projects . 5))))
-  
+
   ;; Diminish packages
 (use-package diminish
   :ensure t
@@ -387,7 +392,7 @@
   (diminish 'company-mode)
   (diminish 'eldoc-mode))
 
-;; -----------------------------  
+;; -----------------------------
 ;; ------------------------------------- Prog modes area ---------------------------------------------- ;;
 ;; -----------------------------
 ;; C++
@@ -395,7 +400,7 @@
   :defer nil
   :commands (c++-mode)
   :mode ("\\.h\\'" . c++-mode))
-  
+
  (use-package company-c-headers
   :defer nil
   :ensure t)
@@ -415,7 +420,7 @@
   :hook
   ((c++-mode c-mode) . irony-mode)
   ('irony-mode-hook) . 'irony-cdb-autosetup-compile-options)
-  
+
 ;; Web development Area
 (use-package js2-mode
   :defer nil
