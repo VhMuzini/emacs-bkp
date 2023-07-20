@@ -11,7 +11,7 @@
  ;; If there is more than one, they won't work right.
  '(inhibit-startup-screen t)
  '(package-selected-packages
-   '(exec-path-from-shell company-prescient doom-themes omnisharp beacon dashboard async mark-multiple duplicate-thing yasnippet-snippets diminish projectile undo-tree company-irony company-c-headers meghanada yasnippet magit which-key treemacs-icons-dired treemacs swiper htmlize all-the-icons highlight-symbol multiple-cursors scss-mode use-package csharp-mode lsp-ui lsp-mode dumb-jump git-modes ng2-mode company-web emmet-mode web-mode-edit-element json-mode dotenv-mode typescript-mode company web-mode js2-mode ivy))
+   '(auto-package-update exec-path-from-shell company-prescient doom-themes omnisharp beacon dashboard async mark-multiple duplicate-thing yasnippet-snippets diminish projectile undo-tree company-irony company-c-headers meghanada yasnippet magit which-key treemacs-icons-dired treemacs swiper htmlize all-the-icons highlight-symbol multiple-cursors scss-mode use-package csharp-mode lsp-ui lsp-mode dumb-jump git-modes ng2-mode company-web emmet-mode web-mode-edit-element json-mode dotenv-mode typescript-mode company web-mode js2-mode ivy))
  '(warning-suppress-types '((lsp-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -24,7 +24,6 @@
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
-;; To make the nvm version work. (I hate node management)
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize))
 
@@ -123,6 +122,22 @@
 ;; Highlight current Line
 ;;(global-hl-line-mode t)
 
+;; Change the focus to the current splited window
+
+(defun split-and-follow-horizontally ()
+  (interactive)
+  (split-window-below)
+  (balance-windows)
+  (other-window 1))
+(global-set-key (kbd "C-x 2") 'split-and-follow-horizontally)
+
+(defun split-and-follow-vertically ()
+  (interactive)
+  (split-window-right)
+  (balance-windows)
+  (other-window 1))
+(global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
+
 ;; ----------------------------------------------------------------------------------------------
 ;; ------------------------------------ Packages Area -------------------------------------------
 ;; ----------------------------------------------------------------------------------------------
@@ -178,7 +193,7 @@
   (setq company-show-numbers t)
   ;;(setq company-tooltip-limit 20)
   ;;(setq company-dabbrev-downcase 0)
-  ;;(setq company-dabbrev-minimum-length 2)
+  (setq company-dabbrev-code-minimum-length 3)
   ;;(setq company-dabbrev-other-buffers t)
   (setq company-dabbrev-code-other-buffers t)
   (setq company-dabbrev-ignore-case 'keep-prefix)
@@ -374,7 +389,7 @@
 	(setq dashboard-set-init-info t)
 	(setq dashboard-path-max-length 60)
 	(setq dashboard-center-content t)
-	(setq dashboard-footer-messages '("Hail Lain!"))
+	;;(setq dashboard-footer-messages '("Hail Lain!"))
 	;;(setq initial-buffer-choice (lambda () (dashboard-refresh-buffer)(get-buffer "*dashboard*")))
     (setq dashboard-items '((recents  . 5)
                             (projects . 5))))
