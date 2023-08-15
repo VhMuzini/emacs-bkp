@@ -9,23 +9,25 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(global-display-line-numbers-mode t)
  '(inhibit-startup-screen t)
  '(package-selected-packages
-   '(auto-package-update exec-path-from-shell company-prescient doom-themes omnisharp beacon dashboard async mark-multiple duplicate-thing yasnippet-snippets diminish projectile undo-tree company-irony company-c-headers meghanada yasnippet magit which-key treemacs-icons-dired treemacs swiper htmlize all-the-icons highlight-symbol multiple-cursors scss-mode use-package csharp-mode lsp-ui lsp-mode dumb-jump git-modes ng2-mode company-web emmet-mode web-mode-edit-element json-mode dotenv-mode typescript-mode company web-mode js2-mode ivy))
- '(warning-suppress-types '((lsp-mode))))
+   '(web-mode dotenv-mode typescript-mode js2-mode json-mode scss-mode lsp-mode emmet-mode diminish dashboard duplicate-thing projectile undo-tree magit which-key treemacs-icons-dired treemacs yasnippet-snippets swiper yasnippet company-prescient company async ivy avy mark-multiple beacon)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "Consolas" :foundry "outline" :slant normal :weight bold :height 120 :width normal)))))
+ '(default ((t (:family "Consolas" :foundry "MS  " :slant normal :weight bold :height 120 :width normal)))))
 
+;; Add melpa to the packages
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
-(when (memq window-system '(mac ns x))
-  (exec-path-from-shell-initialize))
+;; When working with nvm.
+;;(when (memq window-system '(mac ns x))
+;;  (exec-path-from-shell-initialize))
 
 ;; ---------------------- Editor Settings ------------------
 
@@ -35,13 +37,10 @@
 ;; Enable Line Numbers globally
 (global-display-line-numbers-mode 1)
 
-;; I think it's really good
-(load-theme 'doom-moonlight t)
-
 ;; Cursor as a bar
 (setq-default cursor-type 'bar)
 
-;; Auto close parenteses, aspas, chaves e colchetes
+;; Auto close of symbols
 (setq electric-pair-pairs '(
                            (?\{ . ?\})
                            (?\( . ?\))
@@ -73,14 +72,11 @@
 (defun gcm-scroll-down ()
   (interactive)
   (scroll-up 1))
-
 (defun gcm-scroll-up ()
   (interactive)
   (scroll-down 1))
-
 (global-set-key [(control down)] 'gcm-scroll-down)
 (global-set-key [(control up)]   'gcm-scroll-up)
-
 (setq scroll-conservatively 100)
 
 ;; Indent with 4 spaces
@@ -123,7 +119,6 @@
 ;;(global-hl-line-mode t)
 
 ;; Change the focus to the current splited window
-
 (defun split-and-follow-horizontally ()
   (interactive)
   (split-window-below)
@@ -145,10 +140,11 @@
 ;; Defer all packages for quickly startup
 (setq use-package-always-defer t)
 
-(use-package dumb-jump
-:defer nil
-:config
-(add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
+;; Most important part
+(use-package doom-themes
+  :ensure t
+  :defer nil
+  :init (load-theme 'doom-moonlight t))
 
 ;; Breifly highlight the cursor
 (use-package beacon
@@ -171,16 +167,16 @@
 
 ;; Useful frontend completion and functions
 (use-package ivy
-:ensure t
-:defer nil
-:config
-(global-set-key (kbd "C-x b") #'ivy-switch-buffer))
+  :ensure t
+  :defer nil
+  :config
+  (global-set-key (kbd "C-x b") #'ivy-switch-buffer))
 
 ;; Use async when possible
 (use-package async
-  :ensure t
-  :defer nil
-  :init (dired-async-mode 1))
+:ensure t
+:defer nil
+:init (dired-async-mode 1))
 
 ;; Setting up company mode
 (use-package company
@@ -233,44 +229,10 @@
                              (yas-activate-extra-mode 'html-mode))))
 ((prog-mode) . yas-minor-mode))
 
-;; -------------- LSP Configs
-(use-package lsp-mode
-  :ensure t
-  :config
-  (setq lsp-headerline-breadcrumb-enable nil)
-  (setq lsp-enable-snippet t)
-  (setq lsp-modeline-code-actions-mode t)
-  (setq lsp-ui-doc-enable nil)
-  (setq lsp-idle-delay 0.500)
-  (setq lsp-ui-sideline-show-code-actions t)
-  (setq lsp-javascript-completions-complete-function-calls t)
-  (setq lsp-typescript-suggest-complete-function-calls t)
-  (setq lsp-completion-provider :none)
-  (setq lsp-completion-show-label-description nil)
-  (global-set-key (kbd "C-c r") #'lsp-restart-workspace)
-  (add-hook 'before-save-hook #'lsp-format-buffer) ;; Sometimes makes weird stuff
-  :hook
-  ((prog-mode) #'lsp))
-
-
 ;; Best searcher ever
  (use-package swiper
 :ensure t
 :bind ("C-s" . 'swiper))
-
-;; Org mode
-(use-package org
-:config
-(add-hook 'org-mode-hook 'org-indent-mode)
-(add-hook 'org-mode-hook
-		#'(lambda ()
-		   (visual-line-mode 1))))
-
-(use-package org-indent
-  :diminish org-indent-mode)
-
-(use-package htmlize
-  :ensure t)
 
 ;; Tree view
 (use-package treemacs
@@ -339,6 +301,7 @@
 	:ensure t
 	:config (treemacs-icons-dired-mode))
 
+
 ;; Show which key to use
 (use-package which-key
   :ensure t
@@ -349,6 +312,7 @@
 (use-package magit
   :ensure t)
 
+;; Undo Tree
 (use-package undo-tree
   :ensure t
   :defer nil
@@ -394,7 +358,25 @@
     (setq dashboard-items '((recents  . 5)
                             (projects . 5))))
 
-  ;; Diminish packages
+;; LSP Configs
+(use-package lsp-mode
+  :ensure t
+  :config
+  (setq lsp-headerline-breadcrumb-enable nil)
+  (setq lsp-enable-snippet t)
+  (setq lsp-modeline-code-actions-mode t)
+  (setq lsp-ui-doc-enable nil)
+  (setq lsp-idle-delay 0.500)
+  (setq lsp-ui-sideline-show-code-actions t)
+  (setq lsp-javascript-completions-complete-function-calls t)
+  (setq lsp-typescript-suggest-complete-function-calls t)
+  (setq lsp-completion-provider :none)
+  (setq lsp-completion-show-label-description nil)
+  (global-set-key (kbd "C-c r") #'lsp-restart-workspace)
+  (add-hook 'before-save-hook #'lsp-format-buffer) ;; Sometimes makes weird stuff
+  :hook
+  ((prog-mode) #'lsp))
+;; Diminish package
 (use-package diminish
   :ensure t
   :defer nil
@@ -410,50 +392,28 @@
 ;; -----------------------------
 ;; ------------------------------------- Prog modes area ---------------------------------------------- ;;
 ;; -----------------------------
-;; C++
-(use-package c++-mode
-  :defer nil
-  :commands (c++-mode)
-  :mode ("\\.h\\'" . c++-mode))
-
- (use-package company-c-headers
-  :defer nil
-  :ensure t)
-
-(use-package company-irony
-  :defer nil
-  :ensure t
-  :config
-  (setq company-backends '((company-yasnippet :separate
-							company-c-headers
-                            company-dabbrev-code
-                            company-irony))))
-(use-package irony
-  :defer nil
-  :ensure t
-  :config
-  :hook
-  ((c++-mode c-mode) . irony-mode)
-  ('irony-mode-hook) . 'irony-cdb-autosetup-compile-options)
 
 ;; Web development Area
 (use-package js2-mode
+  :ensure t
   :defer nil
   :commands (js2-mode)
   :mode ("\\.js?\\'" . js2-mode))
 
 (use-package typescript-mode
+  :ensure t
   :defer nil
   :commands (typescript-mode)
   :mode ("\\.ts\\'" . typescript-mode))
 
 (use-package dotenv-mode
+  :ensure t
   :commands (dotenv-mode)
   :mode ("\\.env\\'" . dotenv-mode))
 
-
 ;; ------ WEB MODE --------
 (use-package web-mode
+  :ensure t
   :defer nil
   :config
   (setq web-mode-markup-indent-offset 4)
@@ -484,6 +444,7 @@
 
 ;; Css
 (use-package scss-mode
+  :ensure t
   :defer nil
   :commands (scss-mode)
   :mode ((("\\.css\\'" . scss-mode))
@@ -491,6 +452,7 @@
 
 ;; Json-mode
 (use-package json-mode
+  :ensure t
   :defer nil
   :commands (json-mode)
   :mode ("\\.json?\\'" . json-mode))
@@ -500,8 +462,3 @@
 :defer nil
 :commands (csharp-mode)
 :mode ("\\.cs\\'" . csharp-mode))
-
-(use-package omnisharp
-:defer t
-:hook
-((csharp-mode) . omnisharp-mode))
