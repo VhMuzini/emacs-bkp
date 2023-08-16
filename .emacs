@@ -34,9 +34,6 @@
 ;; Start maximized
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
-;; Enable Line Numbers globally
-(global-display-line-numbers-mode 1)
-
 ;; Cursor as a bar
 (setq-default cursor-type 'bar)
 
@@ -320,6 +317,7 @@
   :config
   (global-undo-tree-mode))
 
+;; Project manager
 (use-package projectile
   :ensure t
   :defer nil
@@ -347,14 +345,13 @@
   :config
     (dashboard-setup-startup-hook)
 	(setq dashboard-set-init-info t)
-    (setq dashboard-startup-banner "~/.emacs.d/img/Haruhi_Suzumiya4.png")
-	(setq dashboard-banner-logo-title "Property of Suzumiya Haruhi")
+    (setq dashboard-startup-banner "~/.emacs.d/img/lain.jpg")
+	(setq dashboard-banner-logo-title "Property of Lain")
 	(setq dashboard-set-file-icons t)
 	(setq dashboard-set-init-info t)
 	(setq dashboard-path-max-length 60)
 	(setq dashboard-center-content t)
-	;;(setq dashboard-footer-messages '("Hail Lain!"))
-	;;(setq initial-buffer-choice (lambda () (dashboard-refresh-buffer)(get-buffer "*dashboard*")))
+	(setq dashboard-footer-messages '("Hail Lain!"))
     (setq dashboard-items '((recents  . 5)
                             (projects . 5))))
 
@@ -376,7 +373,8 @@
   (add-hook 'before-save-hook #'lsp-format-buffer) ;; Sometimes makes weird stuff
   :hook
   ((prog-mode) #'lsp))
-;; Diminish package
+
+;; Diminish packages
 (use-package diminish
   :ensure t
   :defer nil
@@ -389,9 +387,9 @@
   (diminish 'company-mode)
   (diminish 'eldoc-mode))
 
-;; -----------------------------
-;; ------------------------------------- Prog modes area ---------------------------------------------- ;;
-;; -----------------------------
+;; ----------------------------------------------------------------------------------------------------
+;; ------------------------------------- Prog modes area ----------------------------------------------
+;; ----------------------------------------------------------------------------------------------------
 
 ;; Web development Area
 (use-package js2-mode
@@ -426,11 +424,11 @@
 		 ("\\.jsx\\'" . web-mode)))
 
 (use-package emmet-mode
-:ensure t
-:config
-(define-key emmet-mode-keymap (kbd "<tab>") 'emmet-expand-line)
-:hook
-((web-mode) . emmet-mode))
+  :ensure t
+  :config
+  (define-key emmet-mode-keymap (kbd "<tab>") 'emmet-expand-line)
+  :hook
+  ((web-mode) . emmet-mode))
 
 (use-package company-web-html
   :config
@@ -442,7 +440,7 @@
                                                company-dabbrev-code
                                                company-keywords))))))
 
-;; Css
+;; Css and SCSS
 (use-package scss-mode
   :ensure t
   :defer nil
