@@ -9,10 +9,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(global-display-line-numbers-mode t)
  '(inhibit-startup-screen t)
  '(package-selected-packages
-   '(web-mode dotenv-mode typescript-mode js2-mode json-mode scss-mode lsp-mode emmet-mode diminish dashboard duplicate-thing projectile undo-tree magit which-key treemacs-icons-dired treemacs yasnippet-snippets swiper yasnippet company-prescient company async ivy avy mark-multiple beacon)))
+   '(web-mode dotenv-mode typescript-mode js2-mode json-mode scss-mode lsp-ui lsp-mode emmet-mode diminish dashboard duplicate-thing projectile undo-tree magit which-key treemacs-icons-dired treemacs yasnippet-snippets swiper yasnippet company-prescient company async ivy avy mark-multiple beacon)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -25,14 +24,13 @@
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
-;; When working with nvm.
-;;(when (memq window-system '(mac ns x))
-;;  (exec-path-from-shell-initialize))
-
 ;; ---------------------- Editor Settings ------------------
 
 ;; Start maximized
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+;; Show line numbers
+(global-display-line-numbers-mode t)
 
 ;; Cursor as a bar
 (setq-default cursor-type 'bar)
@@ -137,6 +135,14 @@
 ;; Defer all packages for quickly startup
 (setq use-package-always-defer t)
 
+;; When working with nvm.
+;;(use-package exec-path-from-shell
+;;  :ensure t
+;  :defer nil
+;;  :if (memq window-system '(mac ns x))
+;;  :config
+;;  (exec-path-from-shell-initialize))
+
 ;; Most important part
 (use-package doom-themes
   :ensure t
@@ -227,7 +233,7 @@
 ((prog-mode) . yas-minor-mode))
 
 ;; Best searcher ever
- (use-package swiper
+(use-package swiper
 :ensure t
 :bind ("C-s" . 'swiper))
 
@@ -346,12 +352,12 @@
     (dashboard-setup-startup-hook)
 	(setq dashboard-set-init-info t)
     (setq dashboard-startup-banner "~/.emacs.d/img/lain.jpg")
-	(setq dashboard-banner-logo-title "Property of Lain")
+	(setq dashboard-banner-logo-title "Lain is here and everywhere")
 	(setq dashboard-set-file-icons t)
 	(setq dashboard-set-init-info t)
 	(setq dashboard-path-max-length 60)
 	(setq dashboard-center-content t)
-	(setq dashboard-footer-messages '("Hail Lain!"))
+	(setq dashboard-footer-messages '("Present day... Present Time"))
     (setq dashboard-items '((recents  . 5)
                             (projects . 5))))
 
@@ -373,6 +379,9 @@
   (add-hook 'before-save-hook #'lsp-format-buffer) ;; Sometimes makes weird stuff
   :hook
   ((prog-mode) #'lsp))
+
+(use-package lsp-ui
+  :ensure t)
 
 ;; Diminish packages
 (use-package diminish
@@ -445,7 +454,7 @@
   :ensure t
   :defer nil
   :commands (scss-mode)
-  :mode ((("\\.css\\'" . scss-mode))
+  :mode (("\\.css\\'" . scss-mode)
 		  ("\\.scss\\'" . scss-mode)))
 
 ;; Json-mode
@@ -460,3 +469,11 @@
 :defer nil
 :commands (csharp-mode)
 :mode ("\\.cs\\'" . csharp-mode))
+
+;; C/C++
+(use-package c++-mode
+  :defer nil
+  :commands (c++-mode)
+  :mode (("\\.c\\'" . c++-mode)
+         ("\\.h\\'" . c++-mode)
+         ("\\.cpp\\'" . c++-mode)))
